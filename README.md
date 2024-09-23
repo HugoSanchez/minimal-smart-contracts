@@ -1,13 +1,21 @@
-# Sample Hardhat Project
+# Smart Contract for a minimal onchain publishing platform
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+Here are the smart contracts for a minimal onchain publishing platform which consist of:
 
-Try running some of the following tasks:
+- A profile registry
+- An ERC1155 collection smart contract
+- A factory for creating new profiles and collections
+- A simple market for fee redirection
+
+Every user owns an ERC1155 smart contract where they will mint all posts. Posts are fully onchain saved as HTML on Ethereum. The factory smart contracts allows to cheaply deploy a new collection smart contract. It's also built in a way that a user can:
+
+- create a new profile
+- create a new collection
+- create a new post
+
+all in a single transaction.
 
 ```shell
-npx hardhat help
+npm install
 npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
 ```

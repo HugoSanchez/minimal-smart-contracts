@@ -1,4 +1,5 @@
 import { expect } from "chai";
+// @ts-ignore
 import { ethers, upgrades } from "hardhat";
 
 describe("ProfileRegistry", function () {
