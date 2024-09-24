@@ -137,7 +137,7 @@ contract MinimalCollection is
 
     function updateContent(uint256 tokenId, string memory newContent) public {
         require(tokenId < _tokenIds, "Token does not exist");
-        require(creator[tokenId] == msg.sender, "Only the owner can update the content");
+        require(creator[tokenId] == msg.sender, "Only the creator can update the content");
         require(block.timestamp <= createdAt[tokenId] + 48 hours, "Update window has expired");
         content[tokenId] = newContent;
     }
