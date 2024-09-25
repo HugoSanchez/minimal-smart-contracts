@@ -19,3 +19,11 @@ all in a single transaction.
 npm install
 npx hardhat test
 ```
+
+## Addresses
+
+### Zora Sepolia Testnet
+
+- Profile Registry: 0x081fd5eDD05da93e9887F510847449EE7d2E1D1F
+- Collection Implementation: 0xc97c3dA66F96267597462dC3D2277edF8f742f68
+- Collection Factory: 0xf6FC826bD937c4aA4377E201275b7B6B5379F47A
