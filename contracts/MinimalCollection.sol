@@ -14,7 +14,7 @@ import {URIEncoding} from "./libraries/URIEncoding.sol";
  * @title  Collection Smart Contract
  * @author Hugo Sanchez
  * @notice This is the new collection implementation. It gives users
- *         more control over their work: they own the collection and tokens.
+ *         control over their work: they own the collection and tokens.
  *         It also allows for social features: members & moderators
  *         as well as read/write permissions for both the collection itself and its tokens.
  */
@@ -58,8 +58,6 @@ contract MinimalCollection is
     mapping(uint256 => uint256) public tokenSupply;
     // TokenID => Creator
     mapping(uint256 => address) public creator;
-    // TokenID => Post title
-    mapping(uint256 => string) public titles;
     // TokenID => Post content
     mapping(uint256 => string) public content;
     // TokenID => Timestamp
@@ -71,9 +69,9 @@ contract MinimalCollection is
     // EVENTS section.
     ////////////////////////////
 
-    event NewVersoCreated(address indexed account, uint256 indexed id, string metadataURI);
-    event NewVersoCollected(address indexed account, uint256 indexed id, uint256 amount);
-    event VersoDeleted(address indexed moderator, uint256 indexed tokenId);
+    event NewPostCreated(address indexed account, uint256 indexed id, string metadataURI);
+    event NewPostCollected(address indexed account, uint256 indexed id, uint256 amount);
+    event PostDeleted(address indexed moderator, uint256 indexed tokenId);
     event URIUpdated(uint256 indexed tokenId, string newUri);
     event ContractURIUpdated(string newUri);
 
@@ -127,7 +125,12 @@ contract MinimalCollection is
 
     function uri(uint256 tokenId) override public view returns (string memory) {
         if (tokenId < _tokenIds) revert InvalidTokenId();
-        return URIEncoding.generateURI(titles[tokenId], content[tokenId], creator[tokenId], address(this), tokenId);
+        return URIEncoding.generateURI(
+            content[tokenId],
+            creator[tokenId],
+            address(this),
+            tokenId
+        );
     }
 
     function setContractURI(string calldata _contractURI) external onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -149,13 +152,11 @@ contract MinimalCollection is
     /**
      * @dev Creates a new token.
      *
-     * @param _title The title of the token.
      * @param _content The content of the token.
      * @param _recipient The recipient of the token.
      * @param _isGated Whether the token is gated.
      */
     function create(
-        string calldata _title,
         string calldata _content,
         address _recipient,
         bool _isGated
@@ -168,13 +169,17 @@ contract MinimalCollection is
         uint256 newTokenId = _tokenIds;
         tokenSupply[newTokenId] = 1;
         creator[newTokenId] = _recipient;
-        titles[newTokenId] = _title;
         content[newTokenId] = _content;
         createdAt[newTokenId] = block.timestamp;
         isGated[newTokenId] = _isGated;
         _mint(_recipient, newTokenId, 1, "");
-        string memory _url = URIEncoding.generateURI(_title, _content, msg.sender, address(this), newTokenId);
-        emit NewVersoCreated(_recipient, newTokenId, _url);
+        string memory _url = URIEncoding.generateURI(
+            _content,
+            _recipient,
+            address(this),
+            newTokenId
+        );
+        emit NewPostCreated(_recipient, newTokenId, _url);
     }
 
 
@@ -204,7 +209,7 @@ contract MinimalCollection is
         IMarketMaster(markerAddress).executeBuy{value: msg.value}(amount, referer, creator[id]);
         _mint(recipient, id, amount, "");
         tokenSupply[id] += amount;
-        emit NewVersoCollected(recipient, id, amount);
+        emit NewPostCollected(recipient, id, amount);
     }
 
     /**

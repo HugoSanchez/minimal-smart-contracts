@@ -53,23 +53,23 @@ describe("MinimalMarket and MinimalCollection", function () {
 
 	describe("MinimalCollection - Create", function () {
 		it("Should allow moderator to create a post", async function () {
-			await expect(collection.create("Test Post", "Content", user1.address, false))
-				.to.emit(collection, "NewVersoCreated")
+			await expect(collection.create("Content", user1.address, false))
+				.to.emit(collection, "NewPostCreated")
 
-			await collection.create("Test Post 2", "Content", user1.address, false);
-			await expect(await collection.titles(1)).to.equal("Test Post");
-			await expect(await collection.titles(2)).to.equal("Test Post 2");
+			await collection.create("Content 2", user1.address, false);
+			expect(await collection.content(1)).to.equal("Content");
+			expect(await collection.content(2)).to.equal("Content 2");
 		});
 
 		it("Should not allow non-moderators to create a post", async function () {
-			await expect(collection.connect(user1).create("Test Post", "Content", user1.address, false))
+			await expect(collection.connect(user1).create("Content", user1.address, false))
 				.to.be.revertedWith("Only moderators allowed");
 		});
 	});
 
 	describe("MinimalCollection - Collect", function () {
 		beforeEach(async function () {
-			await collection.create("Test Post", "Content", owner.address, false);
+			await collection.create("Content", owner.address, false);
 		});
 
 		it("Should allow anyone to collect a post", async function () {
@@ -89,7 +89,7 @@ describe("MinimalMarket and MinimalCollection", function () {
 				gasLimit: gasLimit
 			  });
 			// Check if the transaction was successful
-			await expect(collectTx).to.emit(collection, "NewVersoCollected").withArgs(user1.address, 1, 1);
+			await expect(collectTx).to.emit(collection, "NewPostCollected").withArgs(user1.address, 1, 1);
 		});
 
 		it("Should execute distribute funds properly when collecting", async function () {
@@ -125,9 +125,8 @@ describe("MinimalMarket and MinimalCollection", function () {
 	});
 
 	describe("MinimalCollection - Burn", function () {
-
 		beforeEach(async function () {
-			await collection.create("Test Post", "Content", owner.address, false);
+			await collection.create("Content", owner.address, false);
 			await collection.connect(user1).collect(1, 1, user1.address, referer.address, market.address, { value: ethers.utils.parseEther("0.00043") });
 		});
 
@@ -145,24 +144,24 @@ describe("MinimalMarket and MinimalCollection", function () {
 
 	describe("MinimalCollection - Content Update", function () {
 		beforeEach(async function () {
-			await collection.create("Test Post", "Initial Content", owner.address, false);
+			await collection.create("Initial Content", owner.address, false);
 		});
 
 		it("Should allow creator to update content within 48 hours", async function () {
-			await collection.create("Test Post", "Initial Content", owner.address, false);
+			await collection.create("Initial Content", owner.address, false);
 			await collection.updateContent(1, "Updated Content");
 			expect(await collection.content(1)).to.equal("Updated Content");
 		});
 
 		it("Should not allow non-creators to update content", async function () {
-			await collection.create("Test Post", "Initial Content", owner.address, false);
+			await collection.create("Initial Content", owner.address, false);
 			await expect(collection.connect(user1).updateContent(1, "Unauthorized Update"))
 				.to.be.revertedWith("Only the creator can update the content");
 		});
 
 
 		it("Should not allow updates after 48 hours", async function () {
-			await collection.create("Test Post", "Initial Content", owner.address, false);
+			await collection.create("Initial Content", owner.address, false);
 			await ethers.provider.send("evm_increaseTime", [48 * 60 * 60 + 1]);
 			await ethers.provider.send("evm_mine", []);
 
