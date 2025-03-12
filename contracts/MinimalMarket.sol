@@ -49,7 +49,7 @@ contract MinimalMarket is
             // Set fee divider
             protocolFeeDivider = 10;
             // Set token price
-            basePrice = 0.00042 ether;
+            basePrice = 0 ether;
     }
 
     ////////////////////////////////
@@ -62,6 +62,10 @@ contract MinimalMarket is
 
     function unpause() external onlyOwner {
         _unpause();
+    }
+
+	function setBasePrice(uint _basePrice) public onlyOwner() {
+        basePrice = _basePrice;
     }
 
     function setFeeDestination(address _feeDestination) public onlyOwner() {

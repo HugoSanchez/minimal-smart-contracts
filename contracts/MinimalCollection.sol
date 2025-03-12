@@ -168,18 +168,18 @@ contract MinimalCollection is
         _tokenIds++;
         uint256 newTokenId = _tokenIds;
         tokenSupply[newTokenId] = 1;
-        creator[newTokenId] = _recipient;
+        creator[newTokenId] = msg.sender;
         content[newTokenId] = _content;
         createdAt[newTokenId] = block.timestamp;
         isGated[newTokenId] = _isGated;
         _mint(_recipient, newTokenId, 1, "");
         string memory _url = URIEncoding.generateURI(
             _content,
-            _recipient,
+            msg.sender,
             address(this),
             newTokenId
         );
-        emit NewPostCreated(_recipient, newTokenId, _url);
+        emit NewPostCreated(msg.sender, newTokenId, _url);
     }
 
 
